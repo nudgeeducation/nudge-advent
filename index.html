@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nudge Advent 2026</title>
+<meta name="description" content="Twenty-four doors for December from Nudge Education: a thought on a life worth living for each day, with a joke or quiz question from the cracker.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Lora:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a winter-night wall of twenty-four teal doors; each opens onto a lit
+   room holding one line and that day's calendar. One visual world, single theme by choice. */
+:root {
+  color-scheme: dark;
+  --night: #0e2a27;
+  --night-deep: #091d1b;
+  --teal: #02b99d;
+  --mint: #5dbba1;
+  --teal-deep: #0b7f6e;
+  --snow: #f0f1f5;
+  --ink: #1d1c1d;
+  --ink-soft: #55605e;
+  --glow: #ffd98a;
+  --display: "Montserrat", Arial, Helvetica, sans-serif;
+  --quote: "Lora", Georgia, "Times New Roman", serif;
+}
+* { box-sizing: border-box; }
+html { background: var(--night); }
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255,255,255,0.55) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 71% 4%, rgba(255,255,255,0.45) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 38% 15%, rgba(255,255,255,0.35) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 89% 19%, rgba(255,255,255,0.5) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 55% 9%, rgba(255,255,255,0.3) 0 1px, transparent 1.5px),
+    linear-gradient(180deg, var(--night-deep) 0, var(--night) 420px);
+  background-repeat: no-repeat;
+  color: var(--snow);
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+button { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+
+.wrap {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 36px 20px 48px;
+  display: grid;
+  gap: 28px;
+}
+.eyebrow {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mint);
+}
+h1 {
+  margin: 0;
+  font-weight: 800;
+  font-size: clamp(2.2rem, 6vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+h1 span { color: var(--teal); }
+.sub {
+  margin: 12px 0 0;
+  max-width: 36em;
+  font-family: var(--quote);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: #cfe3de;
+}
+.status {
+  margin: 16px 0 0;
+  min-height: 1.6em;
+  font-weight: 700;
+  color: var(--glow);
+}
+
+.doors {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.doors li { perspective: 700px; }
+.door {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 6px;
+  transform-style: preserve-3d;
+  -webkit-tap-highlight-color: transparent;
+}
+.door:focus-visible { outline: 3px solid var(--glow); outline-offset: 4px; }
+
+/* the lit room behind the door */
+.behind {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  padding: 8px 8px 8px 22%;
+  text-align: center;
+  color: var(--ink);
+  background: radial-gradient(circle at 50% 40%, #fff6dc 0, #ffe7ae 70%, #f2cf85 100%);
+  box-shadow: 0 0 0 3px var(--night-deep), 0 0 0 4px rgba(93,187,161,0.4);
+}
+.behind .mark { font-family: var(--quote); font-size: clamp(1.8rem, 6vw, 2.6rem); line-height: 0.6; color: var(--teal-deep); padding-top: 0.3em; }
+.behind .count { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+
+/* the door leaf, hinged on the left */
+.leaf {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  transform-origin: left center;
+  transition: transform 0.9s cubic-bezier(0.3, 0.1, 0.2, 1), filter 0.9s;
+  background:
+    linear-gradient(90deg, transparent calc(50% - 1px), rgba(9,29,27,0.25) calc(50% - 1px), rgba(9,29,27,0.25) 50%, transparent 50%),
+    linear-gradient(170deg, var(--mint) 0%, var(--teal) 45%, var(--teal-deep) 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(9,29,27,0.35),
+    inset 0 0 0 8px rgba(255,255,255,0.08),
+    inset 0 -18px 24px -14px rgba(9,29,27,0.5);
+}
+.leaf::after {
+  content: "";
+  position: absolute;
+  right: 9%;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--glow) 45%, #c99a3a 85%);
+  box-shadow: 0 1px 2px rgba(9,29,27,0.6);
+}
+.num {
+  font-weight: 800;
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  line-height: 1;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 0 rgba(9,29,27,0.35);
+  transition: opacity 0.3s;
+}
+.door.open { z-index: 2; }
+.door.open .leaf { transform: rotateY(-101deg); filter: brightness(0.7); }
+.door.open .num { opacity: 0; }
+.door.open:hover .leaf { transform: rotateY(-108deg); }
+.door:not(.open):not(.locked):hover .leaf { transform: rotateY(-14deg); }
+.door.today:not(.open) .leaf {
+  box-shadow:
+    inset 0 0 0 2px rgba(9,29,27,0.35),
+    inset 0 0 0 8px rgba(255,255,255,0.08),
+    0 0 0 3px var(--glow),
+    0 0 24px 4px rgba(255,217,138,0.7);
+}
+.door.locked { cursor: default; }
+.door.locked .leaf { filter: saturate(0.55) brightness(0.8); }
+.door.shake { animation: shake 0.45s; }
+@keyframes shake {
+  20% { transform: translateX(-4px); }
+  45% { transform: translateX(4px); }
+  70% { transform: translateX(-2px); }
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(93,187,161,0.3);
+  font-size: 0.88rem;
+  color: #b9cfca;
+}
+.foot button {
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--teal);
+  text-underline-offset: 3px;
+}
+.foot button:hover { color: #fff; }
+.foot button:focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; }
+.note { margin: 0; max-width: 46em; font-size: 0.85rem; color: #9fb8b3; }
+
+/* the card behind each door */
+dialog {
+  width: min(620px, calc(100vw - 32px));
+  max-height: calc(100% - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: var(--snow);
+  color: var(--ink);
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,0.8);
+  overflow: auto;
+  color-scheme: light;
+}
+dialog::backdrop { background: rgba(9,29,27,0.82); }
+.card-top {
+  padding: 30px 30px 26px;
+  text-align: center;
+  background: radial-gradient(circle at 50% 0, #fff6dc 0, #ffe7ae 100%);
+}
+.when {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--teal-deep);
+}
+dialog h2 {
+  margin: 14px auto 0;
+  max-width: 22em;
+  font-family: var(--quote);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.35rem, 4.2vw, 1.8rem);
+  line-height: 1.3;
+  text-wrap: balance;
+}
+.card-events { padding: 20px 30px 6px; }
+.card-events h3 {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.events { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.events li { display: grid; grid-template-columns: 5.6em 1fr; gap: 12px; align-items: baseline; }
+.chip {
+  justify-self: start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1.5px solid currentColor;
+}
+.chip.social { color: #b0452f; }
+.chip.dropin { color: var(--teal-deep); }
+.chip.cpd { color: #3d4f9a; }
+.chip.notice { color: var(--ink-soft); }
+.ev-what { font-weight: 700; }
+.ev-when { display: block; font-weight: 500; font-size: 0.9rem; color: var(--ink-soft); }
+.cracker { margin: 18px 30px 0; padding: 16px 18px; border-radius: 8px; border: 2px dashed #d9a441; background: #fff9ea; }
+.cracker h3 { margin: 0 0 6px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #8a5a00; }
+.cracker p { margin: 0; }
+.cracker .ask { font-weight: 700; }
+.cracker .answer { margin-top: 8px; font-family: var(--quote); font-style: italic; font-size: 1.1rem; }
+.cracker button { margin-top: 10px; padding: 6px 14px; border-radius: 999px; border: 0; background: #b0452f; color: #fff; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+.cracker button:hover { background: #8f3523; }
+.cracker button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.quiet { margin: 0; font-family: var(--quote); font-style: italic; color: var(--ink-soft); }
+.card-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px 18px;
+}
+.card-nav button {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--teal-deep);
+}
+.card-nav button:hover:not(:disabled) { border-color: var(--mint); }
+.card-nav button:disabled { opacity: 0.3; cursor: default; }
+.card-nav button:focus-visible { outline: 2px solid var(--teal-deep); outline-offset: 2px; }
+
+@media (min-width: 560px) { .doors { grid-template-columns: repeat(4, 1fr); gap: 18px; } }
+@media (min-width: 860px) { .doors { grid-template-columns: repeat(6, 1fr); gap: 20px; } .wrap { padding: 52px 32px 56px; } }
+@media (prefers-reduced-motion: reduce) {
+  .leaf, .num { transition: none; }
+  .door.shake { animation: none; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <p class="eyebrow" id="eyebrow">Nudge Education Advent 2026</p>
+    <h1>Twenty-four doors to a <span>life worth living</span></h1>
+    <p class="sub" id="sub">One thought for each day of December, up to Christmas Eve, with a joke or a quiz question from the cracker.</p>
+    <p class="status" id="status" aria-live="polite"></p>
+  </header>
+
+  <section aria-label="The doors">
+    <ul class="doors" id="doors"></ul>
+  </section>
+
+  <div class="foot">
+    <button type="button" id="preview-toggle" aria-pressed="false">Maker’s key: unlock every door</button>
+    <button type="button" id="shut-all">Shut all the doors</button>
+  </div>
+  <p class="note" id="note">From everyone at Nudge Education. A new door opens each day until Christmas Eve.</p>
+  <noscript><p>The doors need JavaScript to open.</p></noscript>
+</main>
+
+<dialog id="card" aria-labelledby="card-title">
+  <div class="card-top">
+    <p class="when" id="card-when"></p>
+    <h2 id="card-title"></h2>
+  </div>
+  <div class="card-events" id="card-events-wrap">
+    <h3 id="card-events-title">In the calendar today</h3>
+    <ul class="events" id="card-events"></ul>
+    <p class="quiet" id="card-quiet" hidden></p>
+  </div>
+  <div class="cracker">
+    <h3 id="cracker-kind"></h3>
+    <p class="ask" id="cracker-ask"></p>
+    <button type="button" id="cracker-pull">Pull the cracker</button>
+    <p class="answer" id="cracker-answer" hidden></p>
+  </div>
+  <div class="card-nav">
+    <button type="button" id="card-prev" aria-label="Previous door">&larr; Earlier</button>
+    <button type="button" id="card-close">Close</button>
+    <button type="button" id="card-next" aria-label="Next door">Later &rarr;</button>
+  </div>
+</dialog>
+
+<script>
+const YEAR = 2026;
+
+// Two editions in one page. The plain address is for families, young people and
+// commissioners. Adding #staff to the address shows the staff edition, which uses the
+// practitioner lines and adds the month's calendar. Both are public: nothing here is private.
+
+// Lines for everyone. The index is the day of December minus one.
+const LINES_PUBLIC = [
+  "A life worth living is built from small things, done often.",
+  "You don’t have to do it all today. One thing is enough.",
+  "Good company makes most days better. Be some.",
+  "Nobody builds a life worth living alone.",
+  "Trust takes as long as it takes.",
+  "Rest is not a reward. You are allowed it anyway.",
+  "Ask someone what matters to them, then listen to the answer.",
+  "Curiosity opens more doors than certainty.",
+  "Everyone is an expert in something. Ask them about it.",
+  "Laughing together counts as time well spent.",
+  "A good ending to the week is worth planning for.",
+  "Put the kettle on first. The plan can wait five minutes.",
+  "Progress can look like the same walk, taken a little further.",
+  "The quiet thing someone says on the way out is often the real one.",
+  "Notice what you move towards. That is your map.",
+  "The best bits of a year rarely get written down. They still happened.",
+  "A kind no is still kind.",
+  "Feeling safe comes first. Everything else grows from there.",
+  "Somebody had a better week because of you. You may never be told.",
+  "Go outside. The sky is doing its best with the daylight it has.",
+  "The shortest day. From here, every afternoon gets a little longer.",
+  "Thank one person today, by name, for one specific thing.",
+  "Put the screen where you can’t see it for an hour.",
+  "A life worth living includes yours. Happy Christmas."
+];
+
+// Lines for staff.
+const LINES_STAFF = [
+  "A life worth living usually starts with one person who keeps turning up.",
+  "Small is not the same as slight. A ten-minute walk can be the whole session.",
+  "You don’t have to fix the day. Being good company in it counts.",
+  "Celebrate the people you do this with. Nobody builds a life worth living alone.",
+  "Trust is built at the speed of the slowest yes.",
+  "Rest is part of the work, not a break from it.",
+  "Ask what matters to them before you ask what’s the matter.",
+  "Curiosity opens more doors than certainty.",
+  "Every young person is an expert in something. Find it and let them teach you.",
+  "Laughing together is evidence. Write it down.",
+  "A good ending to the week is a kind of safety.",
+  "The cup of tea before the plan is part of the plan.",
+  "Progress can look like the same walk, taken a little further.",
+  "Listen for the thing said on the way out of the door.",
+  "Notice what a young person moves towards. That is the map.",
+  "Half of this year’s best work never made it into a report. It still happened.",
+  "A boundary held kindly is a gift.",
+  "Keeping people safe is how we keep doors open.",
+  "Somebody had a better week because of you. You may never be told.",
+  "Go outside. The sky is doing its best with the daylight it has.",
+  "The shortest day. From here, every afternoon gets a little longer.",
+  "Thank one person today, by name, for one specific thing.",
+  "Put the laptop where you can’t see it.",
+  "A life worth living includes yours. Happy Christmas."
+];
+
+// Staff edition only. Events by day of December: [type, what, when]. No links, by decision: this page is public. Types: social, dropin, cpd, notice.
+const EVENTS = {
+  1:  [["cpd", "Trauma Informed Practice", "10am to 1pm"], ["dropin", "Practitioner drop-in, NW", "4 to 5pm"]],
+  2:  [["dropin", "Practitioner drop-in, NE", "4 to 5pm"]],
+  4:  [["social", "Christmas social, L&B", "From 6pm"], ["social", "Christmas social, EoE", "From 7pm"]],
+  5:  [["social", "Christmas social, Y&L", "From 7pm"]],
+  6:  [["social", "Christmas social, Mids", "10:30am to 12pm"]],
+  7:  [["cpd", "Foundations of Equity, Equality, Diversity & Inclusion", "3 to 4:30pm"], ["dropin", "Practitioner drop-in, NW", "4:15 to 5:15pm"]],
+  8:  [["cpd", "FASD Part I", "10am to 1pm"]],
+  9:  [["cpd", "Exploring Pathological Demand Avoidance (PDA)", "Time on the sign-up page"], ["dropin", "Practitioner drop-in, NE", "4 to 5pm"]],
+  10: [["social", "Christmas social, Mids", "From 6:30pm"]],
+  11: [["social", "Christmas social, NW (Warrington)", "From 6pm"], ["social", "Christmas social, NW (Carlisle)", "From 6:45pm"], ["social", "Christmas social, S1", "From 7pm"], ["social", "Christmas social, S2", "From 7pm"]],
+  14: [["cpd", "Trauma Informed Practice", "6 to 9pm"]],
+  15: [["cpd", "Sensory Profiling", "10am to 12pm"]],
+  16: [["dropin", "Practitioner drop-in, NE", "4 to 5pm"]],
+  18: [["cpd", "Nudge Safeguarding Training", "9 to 11am"], ["dropin", "Practitioner drop-in, NW", "12 to 1pm"], ["social", "Christmas social, NE", "From 7pm"]]
+};
+// One cracker per day: ["joke" or "quiz", question, answer].
+const CRACKERS = [
+  ["joke", "What do you call a snowman in July?", "A puddle."],
+  ["quiz", "Which country sends London the Trafalgar Square Christmas tree every year?", "Norway."],
+  ["joke", "Why did the scarecrow get a promotion?", "He was outstanding in his field."],
+  ["quiz", "How many gifts are given in total in The Twelve Days of Christmas?", "364."],
+  ["joke", "What do you call a reindeer with no manners?", "Rude-olph."],
+  ["quiz", "Today is the feast day of which saint, the original behind Santa Claus?", "St Nicholas."],
+  ["joke", "Why are Christmas trees so bad at knitting?", "They keep dropping their needles."],
+  ["quiz", "In which decade was the first commercial Christmas card sent?", "The 1840s (1843)."],
+  ["joke", "What do you get if you eat the Christmas decorations?", "Tinselitis."],
+  ["quiz", "Which Christmas plant is a parasite that grows on other trees?", "Mistletoe."],
+  ["joke", "What is the best Christmas present?", "A broken drum. You can’t beat it."],
+  ["quiz", "Which coin was traditionally hidden in a Christmas pudding?", "A silver sixpence."],
+  ["joke", "How does Good King Wenceslas like his pizza?", "Deep pan, crisp and even."],
+  ["quiz", "How many reindeer pull the sleigh in the poem A Visit from St Nicholas?", "Eight."],
+  ["joke", "What do you call a cat on the beach at Christmas?", "Sandy Claws."],
+  ["quiz", "Which country gave us the decorated Christmas tree?", "Germany."],
+  ["joke", "What did one snowman say to the other?", "Can you smell carrots?"],
+  ["quiz", "Who invented the Christmas cracker, in London in the 1840s?", "Tom Smith, a confectioner."],
+  ["joke", "Why does Santa have three gardens?", "So he can hoe, hoe, hoe."],
+  ["quiz", "Robins on Christmas cards are a nod to which Victorian workers, nicknamed robins for their red uniforms?", "Postmen."],
+  ["quiz", "It is the winter solstice. Roughly how many hours of daylight does Newcastle get today?", "Just over seven."],
+  ["joke", "Who hides in the bakery at Christmas?", "A mince spy."],
+  ["joke", "What do you get if you cross a bell with a skunk?", "Jingle smells."],
+  ["joke", "What do elves learn at school?", "The elf-abet."]
+];
+const TYPE_LABEL = { social: "Social", dropin: "Drop-in", cpd: "Training", notice: "Notice" };
+const QUIET = [
+  "Nothing in the calendar. Keep it that way if you can.",
+  "A clear day. Spend some of it on yourself.",
+  "No events today. The door still opens."
+];
+
+// Where each door hangs on the wall. Fixed, so a door is always in the same place.
+const ORDER = [17, 4, 22, 9, 1, 13, 20, 6, 24, 11, 2, 15, 8, 19, 5, 23, 12, 3, 16, 21, 7, 14, 10, 18];
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const list = document.getElementById("doors");
+const statusEl = document.getElementById("status");
+const card = document.getElementById("card");
+const previewBtn = document.getElementById("preview-toggle");
+const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// On the live site the maker's key is hidden unless the address ends in #preview or #staff-preview.
+const PUBLIC = /(^|\.)(github\.io|nudgeeducation\.online|nudgeeducation\.co\.uk)$/.test(location.hostname);
+let staff = false, preview = false, opened = new Set();
+function storeKey() { return staff ? "nudge-advent-staff-opened" : "nudge-advent-opened"; }
+function readHash() {
+  const h = location.hash.replace("#", "");
+  staff = h === "staff" || h === "staff-preview";
+  preview = h === "preview" || h === "staff-preview";
+  opened = new Set();
+  try { opened = new Set(JSON.parse(localStorage.getItem(storeKey()) || "[]")); } catch (e) {}
+  document.title = staff ? "Nudge Advent 2026: staff" : "Nudge Advent 2026";
+  document.getElementById("eyebrow").textContent = staff ? "Nudge Advent 2026 · Staff edition" : "Nudge Education Advent 2026";
+  document.getElementById("sub").textContent = staff
+    ? "One thought for each day of December, up to Christmas Eve, with a cracker and whatever is in the Nudge calendar that day."
+    : "One thought for each day of December, up to Christmas Eve, with a joke or a quiz question from the cracker.";
+  document.getElementById("note").textContent = staff
+    ? "Events are from the December Monthly Nudge. Venues and sign-up links are in the newsletter and your Google Calendar invites. The 10-year anniversary activity runs all month."
+    : "From everyone at Nudge Education. A new door opens each day until Christmas Eve.";
+}
+function save() {
+  try { localStorage.setItem(storeKey(), JSON.stringify([...opened])); } catch (e) {}
+}
+
+function unlocked(n) { return preview || new Date() >= new Date(YEAR, 11, n); }
+function todayNumber() {
+  const d = new Date();
+  return d.getFullYear() === YEAR && d.getMonth() === 11 && d.getDate() <= 24 ? d.getDate() : 0;
+}
+function eventsFor(n) { return staff ? (EVENTS[n] || []) : []; }
+function lineFor(n) { return (staff ? LINES_STAFF : LINES_PUBLIC)[n - 1]; }
+
+function defaultStatus() {
+  const now = new Date();
+  const first = new Date(YEAR, 11, 1);
+  if (preview) return "The maker’s key is in the lock. Every door will open.";
+  if (now < first) {
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const sleeps = Math.round((first - midnight) / 86400000);
+    return "The first door opens on 1 December. " + (sleeps === 1 ? "One sleep to go." : sleeps + " sleeps to go.");
+  }
+  const t = todayNumber();
+  if (t) return opened.has(t) ? "Door " + t + " is open. Come back tomorrow." : "Door " + t + " is ready to open.";
+  return "All twenty-four doors are open.";
+}
+
+function render() {
+  const t = todayNumber();
+  list.innerHTML = "";
+  ORDER.forEach(n => {
+    const free = unlocked(n), isOpen = free && opened.has(n), count = eventsFor(n).length;
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "door" + (free ? "" : " locked") + (isOpen ? " open" : "") + (n === t ? " today" : "");
+    b.dataset.n = n;
+    b.setAttribute("aria-label", free
+      ? "Door " + n + (isOpen ? ", open" : ", ready to open")
+      : "Door " + n + ", opens on " + n + " December");
+    const behind = document.createElement("span");
+    behind.className = "behind";
+    if (free) {
+      const mark = document.createElement("span");
+      mark.className = "mark"; mark.textContent = "“"; mark.setAttribute("aria-hidden", "true");
+      const c = document.createElement("span");
+      c.className = "count";
+      c.textContent = staff
+        ? (count ? count + (count === 1 ? " event" : " events") : "A quiet day")
+        : (CRACKERS[n - 1][0] === "quiz" ? "Quiz inside" : "Joke inside");
+      behind.append(mark, c);
+    }
+    const leaf = document.createElement("span");
+    leaf.className = "leaf";
+    const num = document.createElement("span");
+    num.className = "num"; num.textContent = n;
+    leaf.appendChild(num);
+    b.append(behind, leaf);
+    li.appendChild(b);
+    list.appendChild(li);
+  });
+  statusEl.textContent = defaultStatus();
+  previewBtn.hidden = PUBLIC && !preview;
+  previewBtn.setAttribute("aria-pressed", String(preview));
+  previewBtn.textContent = preview ? "Maker’s key: lock the doors again" : "Maker’s key: unlock every door";
+}
+
+let current = 0;
+function show(n) {
+  current = n;
+  const date = new Date(YEAR, 11, n);
+  document.getElementById("card-when").textContent = WEEKDAYS[date.getDay()] + " " + n + " December";
+  document.getElementById("card-title").textContent = lineFor(n);
+  document.getElementById("card-events-wrap").hidden = !staff;
+  const ul = document.getElementById("card-events");
+  const quiet = document.getElementById("card-quiet");
+  const evs = eventsFor(n);
+  ul.innerHTML = "";
+  evs.forEach(([type, what, when]) => {
+    const li = document.createElement("li");
+    const chip = document.createElement("span");
+    chip.className = "chip " + type; chip.textContent = TYPE_LABEL[type];
+    const body = document.createElement("span");
+    const w = document.createElement("span"); w.className = "ev-what"; w.textContent = what;
+    const t = document.createElement("span"); t.className = "ev-when"; t.textContent = when;
+    body.append(w, t);
+    li.append(chip, body);
+    ul.appendChild(li);
+  });
+  ul.hidden = !evs.length;
+  quiet.hidden = !!evs.length;
+  quiet.textContent = QUIET[n % QUIET.length];
+  const cr = CRACKERS[n - 1];
+  document.getElementById("cracker-kind").textContent = cr[0] === "quiz" ? "From the cracker: quiz" : "From the cracker: joke";
+  document.getElementById("cracker-ask").textContent = cr[1];
+  const ans = document.getElementById("cracker-answer");
+  ans.textContent = cr[2]; ans.hidden = true;
+  document.getElementById("cracker-pull").hidden = false;
+  document.getElementById("card-prev").disabled = n <= 1;
+  document.getElementById("card-next").disabled = n >= 24 || !unlocked(n + 1);
+  if (!card.open) card.showModal();
+}
+function markOpen(n) {
+  if (opened.has(n)) return;
+  opened.add(n); save();
+  const b = list.querySelector('[data-n="' + n + '"]');
+  if (b) { b.classList.add("open"); b.setAttribute("aria-label", "Door " + n + ", open"); }
+  statusEl.textContent = defaultStatus();
+}
+
+list.addEventListener("click", e => {
+  const b = e.target.closest(".door");
+  if (!b) return;
+  const n = Number(b.dataset.n);
+  if (!unlocked(n)) {
+    statusEl.textContent = "Door " + n + " opens on " + n + " December. It is worth the wait.";
+    b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake");
+    return;
+  }
+  if (opened.has(n)) { show(n); return; }
+  markOpen(n);
+  setTimeout(() => show(n), reduced ? 0 : 750);
+});
+
+function step(by) {
+  const n = current + by;
+  if (n < 1 || n > 24 || !unlocked(n)) return;
+  markOpen(n); show(n);
+}
+document.getElementById("card-prev").addEventListener("click", () => step(-1));
+document.getElementById("card-next").addEventListener("click", () => step(1));
+document.getElementById("card-close").addEventListener("click", () => card.close());
+card.addEventListener("click", e => { if (e.target === card) card.close(); });
+card.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft") step(-1);
+  if (e.key === "ArrowRight") step(1);
+});
+
+document.getElementById("cracker-pull").addEventListener("click", e => {
+  document.getElementById("cracker-answer").hidden = false;
+  e.currentTarget.hidden = true;
+});
+previewBtn.addEventListener("click", () => { preview = !preview; render(); });
+document.getElementById("shut-all").addEventListener("click", () => { opened.clear(); save(); render(); });
+window.addEventListener("hashchange", () => { readHash(); render(); });
+
+readHash();
+render();
+</script>
+</body>
+</html>
