@@ -54,6 +54,18 @@ button { font: inherit; color: inherit; }
   display: grid;
   gap: 28px;
 }
+.banner { display: block; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 0 0 3px var(--night-deep), 0 0 0 4px rgba(93,187,161,0.4); }
+.lock { max-width: 34em; padding: 22px 24px; border-radius: 10px; background: rgba(255,255,255,0.06); box-shadow: 0 0 0 1px rgba(93,187,161,0.35); }
+.lock h2 { margin: 0 0 6px; font-size: 1.3rem; font-weight: 800; }
+.lock p { margin: 0 0 14px; color: #cfe3de; }
+.lock label { display: block; margin-bottom: 6px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--mint); }
+.lock-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.lock input { flex: 1 1 14em; min-width: 0; padding: 10px 12px; border-radius: 6px; border: 2px solid var(--mint); background: var(--snow); color: var(--ink); font: inherit; }
+.lock button { padding: 10px 18px; border-radius: 6px; border: 0; background: var(--teal); color: var(--night-deep); font-weight: 800; cursor: pointer; }
+.lock button:hover { background: var(--mint); }
+.lock button:disabled { opacity: 0.6; cursor: default; }
+.lock input:focus-visible, .lock button:focus-visible { outline: 3px solid var(--glow); outline-offset: 2px; }
+.lock .lock-msg { margin: 12px 0 0; min-height: 1.5em; font-weight: 700; color: var(--glow); }
 .eyebrow {
   margin: 0 0 8px;
   font-size: 0.78rem;
@@ -314,6 +326,7 @@ dialog h2 {
 </head>
 <body>
 <main class="wrap">
+  <img class="banner" id="banner" hidden width="1600" height="533" alt="Five of the Nudge team drawn as Christmas elves, leaning over a row of small wooden doors with two spaniels beside them. The lettering reads Nudge Advent Calendar.">
   <header>
     <p class="eyebrow" id="eyebrow">Nudge Education Advent 2026</p>
     <h1>Twenty-four doors to a <span>life worth living</span></h1>
@@ -321,11 +334,24 @@ dialog h2 {
     <p class="status" id="status" aria-live="polite"></p>
   </header>
 
-  <section aria-label="The doors">
+  <section class="lock" id="lock" hidden aria-labelledby="lock-title">
+    <h2 id="lock-title">Staff edition</h2>
+    <p>Type the staff word from the December Monthly Nudge. This browser will remember it.</p>
+    <form id="lock-form">
+      <label for="lock-word">Staff word</label>
+      <div class="lock-row">
+        <input id="lock-word" name="staff-word" type="text" autocomplete="off" autocapitalize="none" spellcheck="false">
+        <button type="submit" id="lock-go">Open the calendar</button>
+      </div>
+      <p class="lock-msg" id="lock-msg" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <section id="doors-section" aria-label="The doors">
     <ul class="doors" id="doors"></ul>
   </section>
 
-  <div class="foot">
+  <div class="foot" id="foot">
     <button type="button" id="preview-toggle" aria-pressed="false">Maker’s key: unlock every door</button>
     <button type="button" id="shut-all">Shut all the doors</button>
   </div>
@@ -360,8 +386,9 @@ dialog h2 {
 const YEAR = 2026;
 
 // Two editions in one page. The plain address is for families, young people and
-// commissioners. Adding #staff to the address shows the staff edition, which uses the
-// practitioner lines and adds the month's calendar. Both are public: nothing here is private.
+// commissioners. Adding #staff to the address asks for the staff word, then shows the staff
+// edition: its own lines, the month's calendar and a banner. All of that is in staff.bin,
+// encrypted with the staff word, so none of it is readable in this repository.
 
 // Lines for everyone. The index is the day of December minus one.
 const LINES_PUBLIC = [
@@ -391,51 +418,7 @@ const LINES_PUBLIC = [
   "A life worth living includes yours. Happy Christmas."
 ];
 
-// Lines for staff.
-const LINES_STAFF = [
-  "A life worth living usually starts with one person who keeps turning up.",
-  "Small is not the same as slight. A ten-minute walk can be the whole session.",
-  "You don’t have to fix the day. Being good company in it counts.",
-  "Celebrate the people you do this with. Nobody builds a life worth living alone.",
-  "Trust is built at the speed of the slowest yes.",
-  "Rest is part of the work, not a break from it.",
-  "Ask what matters to them before you ask what’s the matter.",
-  "Curiosity opens more doors than certainty.",
-  "Every young person is an expert in something. Find it and let them teach you.",
-  "Laughing together is evidence. Write it down.",
-  "A good ending to the week is a kind of safety.",
-  "The cup of tea before the plan is part of the plan.",
-  "Progress can look like the same walk, taken a little further.",
-  "Listen for the thing said on the way out of the door.",
-  "Notice what a young person moves towards. That is the map.",
-  "Half of this year’s best work never made it into a report. It still happened.",
-  "A boundary held kindly is a gift.",
-  "Keeping people safe is how we keep doors open.",
-  "Somebody had a better week because of you. You may never be told.",
-  "Go outside. The sky is doing its best with the daylight it has.",
-  "The shortest day. From here, every afternoon gets a little longer.",
-  "Thank one person today, by name, for one specific thing.",
-  "Put the laptop where you can’t see it.",
-  "A life worth living includes yours. Happy Christmas."
-];
 
-// Staff edition only. Events by day of December: [type, what, when]. No links, by decision: this page is public. Types: social, dropin, cpd, notice.
-const EVENTS = {
-  1:  [["cpd", "Trauma Informed Practice", "10am to 1pm"], ["dropin", "Practitioner drop-in, NW", "4 to 5pm"]],
-  2:  [["dropin", "Practitioner drop-in, NE", "4 to 5pm"]],
-  4:  [["social", "Christmas social, L&B", "From 6pm"], ["social", "Christmas social, EoE", "From 7pm"]],
-  5:  [["social", "Christmas social, Y&L", "From 7pm"]],
-  6:  [["social", "Christmas social, Mids", "10:30am to 12pm"]],
-  7:  [["cpd", "Foundations of Equity, Equality, Diversity & Inclusion", "3 to 4:30pm"], ["dropin", "Practitioner drop-in, NW", "4:15 to 5:15pm"]],
-  8:  [["cpd", "FASD Part I", "10am to 1pm"]],
-  9:  [["cpd", "Exploring Pathological Demand Avoidance (PDA)", "Time on the sign-up page"], ["dropin", "Practitioner drop-in, NE", "4 to 5pm"]],
-  10: [["social", "Christmas social, Mids", "From 6:30pm"]],
-  11: [["social", "Christmas social, NW (Warrington)", "From 6pm"], ["social", "Christmas social, NW (Carlisle)", "From 6:45pm"], ["social", "Christmas social, S1", "From 7pm"], ["social", "Christmas social, S2", "From 7pm"]],
-  14: [["cpd", "Trauma Informed Practice", "6 to 9pm"]],
-  15: [["cpd", "Sensory Profiling", "10am to 12pm"]],
-  16: [["dropin", "Practitioner drop-in, NE", "4 to 5pm"]],
-  18: [["cpd", "Nudge Safeguarding Training", "9 to 11am"], ["dropin", "Practitioner drop-in, NW", "12 to 1pm"], ["social", "Christmas social, NE", "From 7pm"]]
-};
 // One cracker per day: ["joke" or "quiz", question, answer].
 const CRACKERS = [
   ["joke", "What do you call a snowman in July?", "A puddle."],
@@ -481,16 +464,50 @@ const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // On the live site the maker's key is hidden unless the address ends in #preview or #staff-preview.
 const PUBLIC = /(^|\.)(github\.io|nudgeeducation\.online|nudgeeducation\.co\.uk)$/.test(location.hostname);
-let staff = false, preview = false, opened = new Set();
+let wantStaff = false, staff = false, preview = false, opened = new Set();
+let STAFF = null;   // { lines, events } once the staff word has opened staff.bin
 function storeKey() { return staff ? "nudge-advent-staff-opened" : "nudge-advent-opened"; }
+
+// staff.bin is: 16 bytes salt, 12 bytes IV, then AES-GCM ciphertext. Decrypted, it is a
+// 4-byte length, that many bytes of JSON ({ lines, events }), then the banner JPEG.
+const KDF_ROUNDS = 600000;
+function normalise(word) { return word.toLowerCase().replace(/[^a-z0-9]/g, ""); }
+let staffFile = null;
+async function unlockStaff(word) {
+  try {
+    if (!staffFile) {
+      const res = await fetch("staff.bin");
+      if (!res.ok) throw new Error("missing");
+      staffFile = new Uint8Array(await res.arrayBuffer());
+    }
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(normalise(word)), "PBKDF2", false, ["deriveKey"]);
+    const key = await crypto.subtle.deriveKey(
+      { name: "PBKDF2", salt: staffFile.slice(0, 16), iterations: KDF_ROUNDS, hash: "SHA-256" },
+      base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+    const plain = new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: staffFile.slice(16, 28) }, key, staffFile.slice(28)));
+    const len = new DataView(plain.buffer).getUint32(0);
+    STAFF = JSON.parse(new TextDecoder().decode(plain.slice(4, 4 + len)));
+    document.getElementById("banner").src = URL.createObjectURL(new Blob([plain.slice(4 + len)], { type: "image/jpeg" }));
+    try { localStorage.setItem("nudge-advent-staff-word", word); } catch (e) {}
+    return true;
+  } catch (e) { return false; }
+}
+
 function readHash() {
   const h = location.hash.replace("#", "");
-  staff = h === "staff" || h === "staff-preview";
+  wantStaff = h === "staff" || h === "staff-preview";
+  staff = wantStaff && !!STAFF;
   preview = h === "preview" || h === "staff-preview";
   opened = new Set();
   try { opened = new Set(JSON.parse(localStorage.getItem(storeKey()) || "[]")); } catch (e) {}
-  document.title = staff ? "Nudge Advent 2026: staff" : "Nudge Advent 2026";
-  document.getElementById("eyebrow").textContent = staff ? "Nudge Advent 2026 · Staff edition" : "Nudge Education Advent 2026";
+  const locked = wantStaff && !STAFF;
+  document.getElementById("banner").hidden = !staff;
+  document.getElementById("lock").hidden = !locked;
+  document.getElementById("doors-section").hidden = locked;
+  document.getElementById("foot").hidden = locked;
+  document.getElementById("status").hidden = locked;
+  document.title = wantStaff ? "Nudge Advent 2026: staff" : "Nudge Advent 2026";
+  document.getElementById("eyebrow").textContent = wantStaff ? "Nudge Advent 2026 · Staff edition" : "Nudge Education Advent 2026";
   document.getElementById("sub").textContent = staff
     ? "One thought for each day of December, up to Christmas Eve, with a cracker and whatever is in the Nudge calendar that day."
     : "One thought for each day of December, up to Christmas Eve, with a joke or a quiz question from the cracker.";
@@ -498,6 +515,25 @@ function readHash() {
     ? "Events are from the December Monthly Nudge. Venues and sign-up links are in the newsletter and your Google Calendar invites. The 10-year anniversary activity runs all month."
     : "From everyone at Nudge Education. A new door opens each day until Christmas Eve.";
 }
+async function start() {
+  readHash();
+  render();
+  if (wantStaff && !STAFF) {
+    let saved = "";
+    try { saved = localStorage.getItem("nudge-advent-staff-word") || ""; } catch (e) {}
+    if (saved && await unlockStaff(saved)) { readHash(); render(); }
+  }
+}
+document.getElementById("lock-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const input = document.getElementById("lock-word"), msg = document.getElementById("lock-msg"), go = document.getElementById("lock-go");
+  if (!normalise(input.value)) { msg.textContent = "Type the staff word first."; return; }
+  go.disabled = true; msg.textContent = "Checking…";
+  const ok = await unlockStaff(input.value);
+  go.disabled = false;
+  if (ok) { msg.textContent = ""; input.value = ""; readHash(); render(); }
+  else msg.textContent = "That isn’t the word. It is in the December Monthly Nudge.";
+});
 function save() {
   try { localStorage.setItem(storeKey(), JSON.stringify([...opened])); } catch (e) {}
 }
@@ -507,8 +543,8 @@ function todayNumber() {
   const d = new Date();
   return d.getFullYear() === YEAR && d.getMonth() === 11 && d.getDate() <= 24 ? d.getDate() : 0;
 }
-function eventsFor(n) { return staff ? (EVENTS[n] || []) : []; }
-function lineFor(n) { return (staff ? LINES_STAFF : LINES_PUBLIC)[n - 1]; }
+function eventsFor(n) { return staff ? (STAFF.events[n] || []) : []; }
+function lineFor(n) { return (staff ? STAFF.lines : LINES_PUBLIC)[n - 1]; }
 
 function defaultStatus() {
   const now = new Date();
@@ -641,10 +677,9 @@ document.getElementById("cracker-pull").addEventListener("click", e => {
 });
 previewBtn.addEventListener("click", () => { preview = !preview; render(); });
 document.getElementById("shut-all").addEventListener("click", () => { opened.clear(); save(); render(); });
-window.addEventListener("hashchange", () => { readHash(); render(); });
+window.addEventListener("hashchange", start);
 
-readHash();
-render();
+start();
 </script>
 </body>
 </html>
